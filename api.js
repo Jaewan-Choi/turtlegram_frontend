@@ -36,8 +36,13 @@ async function handleLogin(){
     })
 
     response_json = await response.json()
-    localStorage.setItem("token", response_json.token)
 
+    if (response.status == 200){
+        localStorage.setItem("token", response_json.token)
+        window.location.replace(`${frontend_base_url}/`);
+    }else{
+        alert(response.status)
+    }
 }
 
 
@@ -48,10 +53,14 @@ async function getName(){
             'Authorization':localStorage.getItem("token")
         }
     })
-    response_json = await response.json()
 
-    const username = document.getElementById("username")
-    username.innerText = response_json.email
+    if (response.status==200){
+        response_json = await response.json()
+        return response_json.email
+    }
+    else {
+        return null
+    }
 }
 
 
@@ -86,4 +95,26 @@ async function getArticles(){
     response_json = await response.json()
 
     return response_json.articles
+}
+
+
+function logout(){
+    localStorage.removeItem("token")
+    window.location.replace(`${frontend_base_url}/`)
+}
+
+
+function articleDetail(article_id){
+    const url = `${frontend_base_url}/article_detail.html?id=${article_id}`
+    location.href=url
+}
+
+
+async function getArticleDetail(article_id){
+    const response = await fetch(`${backend_base_url}/article/${article_id}`,{
+        method:'GET',
+    })
+    response_json = await response.json()
+
+    return response_json.article
 }
